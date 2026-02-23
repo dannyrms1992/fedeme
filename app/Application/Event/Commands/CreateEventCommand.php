@@ -31,12 +31,19 @@ final class CreateEventCommand
             'created_by'      => $data['created_by'],
         ]);
 
-        // Seed default landing modules
-        $defaultModules = ['hero', 'info', 'contact', 'emergency'];
-        foreach ($defaultModules as $index => $type) {
+        // Seed default landing modules (all 6 types, pdf/map inactive by default)
+        $defaultModules = [
+            ['type' => 'hero',      'is_active' => true],
+            ['type' => 'info',      'is_active' => true],
+            ['type' => 'contact',   'is_active' => true],
+            ['type' => 'pdf',       'is_active' => false],
+            ['type' => 'map',       'is_active' => false],
+            ['type' => 'emergency', 'is_active' => true],
+        ];
+        foreach ($defaultModules as $index => $moduleData) {
             $event->modules()->create([
-                'type'      => $type,
-                'is_active' => true,
+                'type'      => $moduleData['type'],
+                'is_active' => $moduleData['is_active'],
                 'order'     => $index + 1,
             ]);
         }

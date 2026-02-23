@@ -17,6 +17,8 @@
             <ul class="space-y-2 text-sm">
     @php
                 $moduleLabels = ['hero' => 'Hero / Inicio', 'info' => 'Información', 'contact' => 'Contactos', 'pdf' => 'Documento PDF', 'map' => 'Mapa Turístico', 'emergency' => 'Números de Emergencia'];
+                $existingTypes = $event->modules->pluck('type')->toArray();
+                $missingTypes = array_diff(array_keys($moduleLabels), $existingTypes);
                 @endphp
             @foreach($event->modules as $loop_module)
                     <li class="flex items-center gap-1">
@@ -52,6 +54,25 @@
                     </li>
                 @endforeach
             </ul>
+        </div>
+
+            {{-- Añadir módulos faltantes --}}
+            @if(count($missingTypes) > 0)
+            <div class="mt-5 pt-4 border-t border-gray-100">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Añadir módulo</p>
+                @foreach($missingTypes as $missingType)
+                <form method="POST" action="{{ route('admin.events.modules.store', $event) }}" class="mb-2">
+                    @csrf
+                    <input type="hidden" name="type" value="{{ $missingType }}">
+                    <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-xs text-blue-700 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-lg transition font-medium">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                        {{ $moduleLabels[$missingType] }}
+                    </button>
+                </form>
+                @endforeach
+            </div>
+            @endif
+
         </div>
     </div>
     

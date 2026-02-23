@@ -97,4 +97,31 @@ final class EventModuleController extends Controller
 
         return back()->with('success', 'Módulo "' . $module->type . '" actualizado.');
     }
+
+    public function store(Request $request, Event $event): RedirectResponse
+    {
+        $allowed = ['hero', 'info', 'contact', 'pdf', 'map', 'emergency'];
+
+        $request->validate([
+            'type' => ['required', 'string', 'in:' . implode(',', $allowed)],
+        ]);
+
+        $type = $request->input('type');
+
+        // Prevent duplicates
+        if ($event->modules()->where('type', $type)->exists()) {
+            return back()->with('error', 'El módulo "' . $type . '" ya existe en este evento.');
+        }
+
+        $lastOrder = $event->modules()->max('order') ?? 0;
+
+        $event->modules()->create([
+            'type'      => $type,
+            'is_active' => false,
+            'order'     => $lastOrder + 1,
+            'settings'  => [],
+        ]);
+
+        return back()->with('success', 'Módulo añadido correctamente. Configúralo y actívalo cuando esté listo.');
+    }
 }

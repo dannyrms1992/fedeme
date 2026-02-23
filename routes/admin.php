@@ -37,6 +37,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Module content editor
     Route::get('events/{event}/modules', [\App\Interfaces\Http\Controllers\Admin\EventModuleController::class, 'edit'])
         ->name('events.modules.edit');
+    Route::post('events/{event}/modules', [\App\Interfaces\Http\Controllers\Admin\EventModuleController::class, 'store'])
+        ->name('events.modules.store');
     Route::patch('events/{event}/modules/{module}', [\App\Interfaces\Http\Controllers\Admin\EventModuleController::class, 'update'])
         ->name('events.modules.update');
     Route::post('events/{event}/modules/{module}/reorder', [\App\Interfaces\Http\Controllers\Admin\EventModuleController::class, 'reorder'])
