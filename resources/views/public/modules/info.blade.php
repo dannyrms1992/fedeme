@@ -111,15 +111,46 @@
                                 {{ ($dateStart && $dateEnd && $dateStart !== $dateEnd) ? 'Fechas del Evento' : 'Fecha del Evento' }}
                             </p>
                             <p class="text-sm font-medium text-gray-800 leading-snug">{{ $dateLabel }}</p>
-                            @if($dateStart && $dateEnd && $dateStart !== $dateEnd)
-                                @php
-                                    $dtS2 = \DateTime::createFromFormat('Y-m-d', $dateStart);
-                                    $dtE2 = \DateTime::createFromFormat('Y-m-d', $dateEnd);
-                                    $diff = $dtS2 && $dtE2 ? ($dtS2->diff($dtE2)->days + 1) : null;
-                                @endphp
-                                @if($diff)
-                                    <p class="text-xs text-gray-500 mt-1">{{ $diff }} {{ $diff === 1 ? 'día' : 'días' }}</p>
-                                @endif
+                            @php
+                                $today = new \DateTime('now', new \DateTimeZone(config('app.timezone', 'America/Guayaquil')));
+                                $today->setTime(0, 0, 0);
+                                $dtS2 = $dateStart ? \DateTime::createFromFormat('Y-m-d', $dateStart) : null;
+                                $dtE2 = $dateEnd   ? \DateTime::createFromFormat('Y-m-d', $dateEnd)   : null;
+                                if ($dtS2) $dtS2->setTime(0, 0, 0);
+                                if ($dtE2) $dtE2->setTime(0, 0, 0);
+
+                                // Duración del evento
+                                $duration = ($dtS2 && $dtE2 && $dateStart !== $dateEnd)
+                                    ? ($dtS2->diff($dtE2)->days + 1) : null;
+
+                                // Countdown
+                                $countdown = null;
+                                $countdownLabel = '';
+                                if ($dtS2) {
+                                    $daysToStart = (int) $today->diff($dtS2)->days;
+                                    $started     = $today >= $dtS2;
+                                    $ended       = $dtE2 && $today > $dtE2;
+                                    if ($ended) {
+                                        $countdownLabel = 'Evento finalizado';
+                                    } elseif ($started) {
+                                        $countdownLabel = '¡En curso!';
+                                    } elseif ($daysToStart === 0) {
+                                        $countdownLabel = '¡Hoy es el evento!';
+                                    } elseif ($daysToStart === 1) {
+                                        $countdownLabel = 'Falta 1 día';
+                                    } else {
+                                        $countdownLabel = 'Faltan ' . $daysToStart . ' días';
+                                    }
+                                }
+                            @endphp
+                            @if($countdownLabel)
+                                <p class="text-xs font-semibold mt-1.5 px-2 py-0.5 rounded-full inline-block"
+                                   style="background: color-mix(in srgb, var(--color-secondary) 12%, white); color: var(--color-secondary)">
+                                    {{ $countdownLabel }}
+                                </p>
+                            @endif
+                            @if($duration)
+                                <p class="text-xs text-gray-400 mt-1">Duración: {{ $duration }} {{ $duration === 1 ? 'día' : 'días' }}</p>
                             @endif
                         </div>
                     </div>
