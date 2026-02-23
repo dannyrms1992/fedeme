@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── 1. Tipografía base ────────────────────────────────────────────── */
+@layer base {
+    :root {
+        --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+
+    html {
+        font-family: var(--font-sans);
+        font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04';
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* Escala tipográfica global */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-sans);
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        line-height: 1.1;
+    }
+
+    p, li, span, a {
+        font-family: var(--font-sans);
+        line-height: 1.6;
+    }
+}
+
+/* ── 2. Sistema de secciones ─────────────────────────────────────── */
+@layer components {
+
+    /* Badge de sección */
+    .section-badge {
+        @apply inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4;
+    }
+
+    /* Título principal de sección (h2) */
+    .section-title {
+        @apply text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900;
+        letter-spacing: -0.03em;
+    }
+
+    /* Descripción de sección */
+    .section-description {
+        @apply mt-4 text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed;
+    }
+
+    /* Accent bar debajo del título */
+    .section-accent-bar {
+        @apply mt-5 h-1 w-16 rounded-full mx-auto;
+        background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+    }
+
+    /* Bloque header completo centrado */
+    .section-header {
+        @apply text-center mb-12;
+    }
+
+    /* Título hero (h1) */
+    .hero-title {
+        @apply text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-none;
+        letter-spacing: -0.04em;
+    }
+
+    /* Subtitulo hero */
+    .hero-subtitle {
+        @apply text-lg md:text-xl font-light opacity-90 max-w-2xl mx-auto leading-relaxed;
+    }
+
+    /* Título de tarjeta */
+    .card-title {
+        @apply text-lg font-bold text-gray-800 leading-snug;
+        letter-spacing: -0.01em;
+    }
+
+    /* Meta de tarjeta (rol, fecha, etc) */
+    .card-meta {
+        @apply text-sm font-medium text-gray-400 uppercase tracking-wide;
+    }
+
+    /* Texto de cuerpo en tarjeta */
+    .card-body {
+        @apply text-sm text-gray-600 leading-relaxed;
+    }
+}
+
+/* FEDEME Official Color Palette */
+:root {
+    /* Brand Primary (Azul institucional) */
+    --brand-50: #E8F0F8;
+    --brand-100: #C7DBEC;
+    --brand-300: #6FA3D1;
+    --brand-500: #1F4E79;
+    --brand-600: #173E63;
+    --brand-700: #122F4B;
+    --brand-900: #0A1F33;
+    
+    /* Brand Accent (Rojo institucional) */
+    --accent-100: #FAD4D6;
+    --accent-300: #E57373;
+    --accent-500: #C1121F;
+    --accent-600: #9C0E18;
+    --accent-700: #7A0B12;
+    
+    /* Brand Support (Celeste técnico) */
+    --support-100: #D9ECF7;
+    --support-300: #5DA9DD;
+    --support-500: #2E86C1;
+    --support-600: #1F6FA4;
+    
+    /* Military Context */
+    --military-100: #E4E8DD;
+    --military-300: #8A9A5B;
+    --military-500: #4B5320;
+    --military-700: #2F3614;
+    
+    /* Dynamic colors per event (set inline) */
+    --color-primary: #1F4E79;
+    --color-secondary: #C1121F;
+}
+
+/* Glass effect utilities */
+@layer utilities {
+    .glass {
+        background: var(--glass-bg, rgba(255, 255, 255, 0.85));
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.3));
+    }
+    
+    .glass-dark {
+        background: color-mix(in srgb, var(--color-primary, #1F4E79) 15%, transparent);
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .section-divider {
+        @apply relative overflow-hidden;
+    }
+    
+    .section-divider::after {
+        content: '';
+        @apply absolute bottom-0 left-0 right-0 h-px;
+        background: linear-gradient(90deg, transparent, rgba(31, 78, 121, 0.2), transparent);
+    }
+}
+
+/* Carousel animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(1.05);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.carousel-item {
+    animation: fadeIn 0.6s ease-in-out;
+}
