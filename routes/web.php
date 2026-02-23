@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Root domain — solo responde en fedeme.test (no en subdominios de evento)
-Route::domain(env('APP_DOMAIN', 'fedeme.test'))->group(function () {
+Route::domain(config('app.domain', 'fedeme.app'))->group(function () {
     Route::get('/', function () {
         return view('welcome');
     })->name('home');

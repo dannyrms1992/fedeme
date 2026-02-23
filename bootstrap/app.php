@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Event subdomain routes — ONLY match *.fedeme.ec subdomains
             // Without this domain constraint every request to fedeme.test/ also
             // matches GET / and crashes because TenantContext is not resolved.
-            $appDomain = ltrim(env('APP_DOMAIN', 'fedeme.ec'), '.');
+            $appDomain = ltrim(config('app.domain', 'fedeme.app'), '.');
             \Illuminate\Support\Facades\Route::domain('{subdomain}.' . $appDomain)
                 ->middleware('web')
                 ->group(base_path('routes/event.php'));
