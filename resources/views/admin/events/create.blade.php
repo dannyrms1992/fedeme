@@ -34,7 +34,7 @@
                         <input type="text" name="subdomain" value="{{ old('subdomain') }}"
                             class="w-full border border-gray-300 rounded-l-lg px-3 py-2 text-sm font-mono @error('subdomain') border-red-400 @enderror"
                             placeholder="juegos2026">
-                        <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg px-3 py-2 text-xs text-gray-500 whitespace-nowrap">.fedeme.ec</span>
+                        <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg px-3 py-2 text-xs text-gray-500 whitespace-nowrap">.fedeme.app</span>
                     </div>
                     @error('subdomain') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>

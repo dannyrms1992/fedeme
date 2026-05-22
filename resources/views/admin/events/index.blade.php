@@ -25,7 +25,7 @@
             @forelse($events as $event)
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 font-medium text-gray-900">{{ $event->name }}</td>
-                    <td class="px-6 py-4 font-mono text-gray-500">{{ $event->subdomain }}.fedeme.ec</td>
+                    <td class="px-6 py-4 font-mono text-gray-500">{{ $event->subdomain }}.fedeme.app</td>
                     <td class="px-6 py-4">
                         <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
                             @if($event->status->value === 'active') bg-green-100 text-green-700
@@ -41,9 +41,15 @@
                             <span class="text-gray-400 text-xs">Abierto</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 flex gap-2">
-                        <a href="{{ route('admin.events.edit', $event) }}" class="text-blue-600 hover:underline text-xs">Editar</a>
+                    <td class="px-6 py-4 flex gap-2 items-center">
+                        <a href="{{ route('admin.events.show', $event) }}" class="text-blue-600 hover:underline text-xs">Editar</a>
                         <a href="{{ route('admin.events.access.edit', $event) }}" class="text-orange-600 hover:underline text-xs">Acceso</a>
+                        <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
+                              onsubmit="return confirm('¿Eliminar el evento «{{ addslashes($event->name) }}»? Esta acción no se puede deshacer.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:underline text-xs">Eliminar</button>
+                        </form>
                     </td>
                 </tr>
             @empty

@@ -1,7 +1,7 @@
 # FEDEME — Plataforma de Gestión de Eventos
 ## Archivo de contexto para continuación del desarrollo
 
-> Actualizado: 22 de febrero de 2026 (sesión 3)  
+> Actualizado: 13 de mayo de 2026 (sesión 4)  
 > Uso: Abrir este archivo y decirle a GitHub Copilot: **"Lee CONTEXT.md y continúa el desarrollo del proyecto FEDEME"**
 
 ---
@@ -12,8 +12,8 @@ Actúa como arquitecto senior en Laravel 10+, experto en sistemas SaaS multi-ten
 
 Estoy desarrollando la plataforma oficial de gestión de eventos para FEDEME (Federación Deportiva Militar del Ecuador).
 
-**DOMINIO PRINCIPAL:** fedeme.ec  
-**Subdominios dinámicos:** evento1.fedeme.ec, evento2.fedeme.ec
+**DOMINIO PRINCIPAL:** fedeme.app  
+**Subdominios dinámicos:** evento1.fedeme.app, evento2.fedeme.app
 
 ---
 
@@ -113,7 +113,7 @@ Redis cache + queue, Supervisor workers, OPcache, indexación adecuada, evitar N
 
 ### DESPLIEGUE
 
-Nginx wildcard `*.fedeme.ec`, SSL wildcard, deploy por Git pull, migraciones automatizadas.
+Nginx wildcard `*.fedeme.app`, SSL wildcard, deploy por Git pull, migraciones automatizadas.
 
 ---
 
@@ -126,7 +126,7 @@ Nginx wildcard `*.fedeme.ec`, SSL wildcard, deploy por Git pull, migraciones aut
 - **Spatie Laravel Permission**: v7.2.1
 - **TailwindCSS**: v4 (via @tailwindcss/vite)
 - **Vite**: 7.3.1
-- **SQLite** (desarrollo local)
+- **MySQL 8.0.45** (desarrollo local — `fedeme_local`) ✅ sincronizado con producción
 
 ---
 
@@ -333,9 +333,12 @@ resources/views/
 
 ### Build de assets
 
-- Último build: `app-DeQxo3Ah.css` (67.41 kB) + `app-CBbTb_k3.js` (83.04 kB)
+- Último build: `app-BmsHQmYg.css` (70.89 kB) + `app-CBbTb_k3.js` (83.04 kB)
 - Storage symlink: `public/storage` → `storage/app/public` ✅
-- Imágenes emergency: `storage/app/public/modules/emergency/`
+- Imágenes sincronizadas desde producción:
+  - `storage/app/public/events/1/logo/` — logo evento sudamericano
+  - `storage/app/public/events/1/carousel/` — 3 imágenes carrusel
+  - `storage/app/public/modules/emergency/` — logo módulo emergency
 
 ---
 
@@ -345,12 +348,32 @@ resources/views/
 |---|---|
 | APP_URL | http://fedeme.test |
 | APP_DOMAIN | fedeme.test |
+| DB_CONNECTION | mysql |
+| DB_DATABASE | fedeme_local |
+| DB_USERNAME | root |
 | Timezone | America/Guayaquil |
 | Locale | es / es_EC |
 | Session domain | .fedeme.test |
-| Cache | Redis |
-| Queue | Redis |
+| Session driver | file |
+| Cache | database (local) / Redis (prod) |
+| Queue | database (local) / Redis (prod) |
 | Log access | storage/logs/access_attempts.log |
+
+### Subdominios locales (`C:\Windows\System32\drivers\etc\hosts`) ✅
+
+```
+127.0.0.1 fedeme.test
+127.0.0.1 sudamericano.fedeme.test
+127.0.0.1 campeonato.fedeme.test
+127.0.0.1 mundial.fedeme.test
+```
+
+### Eventos en BD local (2)
+
+| ID | Nombre | Subdominio | Estado |
+|---|---|---|---|
+| 1 | Campeonato Sudamericano de Equitación | `sudamericano` | active |
+| 4 | Campeonato Mundial Militar de Equitación | `mundial` | draft |
 
 ---
 
@@ -358,21 +381,21 @@ resources/views/
 
 ### Prioridad Alta
 
-- [ ] **Configurar subdominios locales en Herd** — añadir `evento1.fedeme.test` etc. al `/etc/hosts` para pruebas multi-tenant
+- [x] ~~Configurar subdominios locales~~ — `sudamericano.fedeme.test` y `campeonato.fedeme.test` en hosts ✅
 - [ ] **Gradientes de sección** — actualmente en 5-8% (muy sutiles), subir a 15-30% para hacerlos visibles
-- [ ] **Probar flujo completo de emergency** — subir logo desde admin y verificar en landing pública
+- [x] ~~Probar flujo completo de emergency~~ — logo sincronizado desde producción ✅
 
 ### Prioridad Media
 
 - [ ] **Módulos adicionales**: programa/agenda, galería de fotos, resultados/clasificaciones
 - [ ] **Política de autorización** — `EventController` aún no usa Spatie policies (solo `auth`)
 - [ ] **Tests** — feature tests para CRUD de eventos y flujo de acceso por código
+- [ ] **Script de deploy** — crear `deploy.sh` para automatizar `git pull + migrate + cache` en VPS
 
 ### Prioridad Baja (Fase 2)
 
 - [ ] Configuración Nginx + Certbot wildcard SSL en VPS Ubuntu 22.04
-- [ ] MySQL 8 en producción (reemplazar SQLite)
-- [ ] Redis en producción para cache y queue
+- [ ] Redis en producción para cache y queue (ya está instalado, activar en .env)
 - [ ] GitHub Actions CI/CD — deploy automático por push a `main`
 - [ ] Supervisor para queue workers
 - [ ] Script de despliegue automatizado (`deploy.sh`)
@@ -386,7 +409,7 @@ resources/views/
 `SESSION_DOMAIN=.fedeme.test` en `.env` es **crítico**. Sin el punto inicial las sesiones no se comparten entre subdominios y el código de acceso no persistirá.
 
 ### SSL Wildcard en producción
-Certbot wildcard requiere **DNS-01 challenge**. El proveedor DNS de `fedeme.ec` debe soportar API automation. Si el DNS es manual, el wildcard se obtiene pero no se renueva automáticamente.
+Certbot wildcard requiere **DNS-01 challenge**. El proveedor DNS de `fedeme.app` debe soportar API automation. Si el DNS es manual, el wildcard se obtiene pero no se renueva automáticamente.
 
 ### GlobalScope
 `EventScope` aplica a `EventModule` y cualquier modelo futuro que dependa de `event_id`. El modelo `Event` **NO lleva scope propio** — siempre se consulta sin filtro de tenant para poder resolver el tenant desde el subdominio.
@@ -433,6 +456,44 @@ Gradiente diagonal `135deg` de `color-mix(primary 92%, black)` a `color-mix(seco
 
 ### Módulo map — responsive
 La barra browser decorativa (puntos rojo/amarillo/verde + barra URL) se oculta en mobile (`hidden sm:flex`). El botón "Abrir en Google Maps" siempre visible, centrado en mobile con mejor contraste (`bg-white/10 border-white/20 text-white font-semibold`).
+
+### Acción Eliminar en listado de eventos
+`admin/events/index.blade.php` incluye botón Eliminar con `confirm()` nativo. Envía `DELETE /admin/events/{id}` via formulario con `@method('DELETE')`. El controlador `EventController::destroy()` borra el evento e invalida su caché Redis.
+
+### Sincronización BD local ↔ producción
+
+**Producción → Local** (reimportar datos frescos):
+```powershell
+# 1. Generar dump en servidor (preserva UTF-8)
+ssh root@187.77.53.137 "mysqldump -u fedeme_user -pFedemeDB2026! --no-tablespaces --default-character-set=utf8mb4 fedeme_prod > /tmp/fedeme_dump.sql"
+
+# 2. Descargar con SCP (transferencia binaria, NO usar ssh ... > archivo)
+scp root@187.77.53.137:/tmp/fedeme_dump.sql C:\Users\rms\Development\fedeme\fedeme_dump.sql
+
+# 3. Importar con cmd (NO PowerShell, para preservar UTF-8)
+cmd /c "chcp 65001 > nul && \"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe\" -u root -pDanito1992. --default-character-set=utf8mb4 fedeme_local < C:\Users\rms\Development\fedeme\fedeme_dump.sql"
+
+# 4. Limpiar
+Remove-Item fedeme_dump.sql
+```
+
+**Local → Producción** (subir datos locales, SOBREESCRIBE producción):
+```powershell
+# Solo cuando producción no tenga datos reales que conservar
+ssh root@187.77.53.137 "mysqldump ... fedeme_local > /tmp/local_dump.sql"
+scp /tmp/local_dump.sql root@187.77.53.137:/tmp/
+ssh root@187.77.53.137 "mysql -u fedeme_user -pFedemeDB2026! fedeme_prod < /tmp/local_dump.sql"
+```
+
+**⚠️ IMPORTANTE:** Nunca usar `ssh ... | mysql` ni `ssh ... > archivo.sql` desde PowerShell — convierte UTF-8 a CP850 corrompiendo tildes. Siempre: dump en servidor → SCP → importar con `cmd /c chcp 65001`.
+
+### Sincronización imágenes local ↔ producción
+
+```powershell
+# Producción → Local (todas las imágenes)
+scp -r root@187.77.53.137:/var/www/fedeme/storage/app/public/events C:\Users\rms\Development\fedeme\storage\app\public\
+scp -r root@187.77.53.137:/var/www/fedeme/storage/app/public/modules C:\Users\rms\Development\fedeme\storage\app\public\
+```
 
 ---
 

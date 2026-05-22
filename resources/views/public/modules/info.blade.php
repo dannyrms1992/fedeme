@@ -33,7 +33,7 @@
     $mapsNavUrl = $locationQuery ? 'https://www.google.com/maps/dir/?api=1&destination=' . urlencode($locationQuery) : '';
 @endphp
 
-<section class="py-20 px-4" style="background: linear-gradient(to bottom, color-mix(in srgb, var(--color-primary) 8%, var(--color-bg)), color-mix(in srgb, var(--color-secondary) 6%, var(--color-bg)))">
+<section class="py-10 px-4" style="background: linear-gradient(to bottom, color-mix(in srgb, var(--color-primary) 8%, var(--color-bg)), color-mix(in srgb, var(--color-secondary) 6%, var(--color-bg)))">
     <div class="max-w-6xl mx-auto">
 
         {{-- Header de sección --}}

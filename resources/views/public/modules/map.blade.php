@@ -9,7 +9,7 @@
 @endphp
 
 @if($query)
-<section class="py-20" style="background: linear-gradient(to bottom, color-mix(in srgb, var(--color-primary) 5%, var(--color-bg)), color-mix(in srgb, var(--color-secondary) 7%, var(--color-bg)))">
+<section class="py-10" style="background: linear-gradient(to bottom, color-mix(in srgb, var(--color-primary) 5%, var(--color-bg)), color-mix(in srgb, var(--color-secondary) 7%, var(--color-bg)))">
     <div class="max-w-6xl mx-auto px-4">
 
         {{-- Header --}}

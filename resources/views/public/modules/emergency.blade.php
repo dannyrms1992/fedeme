@@ -7,7 +7,7 @@
 @endphp
 
 @if(!empty($phone))
-<section id="emergencias" class="py-20 px-4" style="background: linear-gradient(to bottom, color-mix(in srgb, var(--color-secondary) 7%, var(--color-bg)), color-mix(in srgb, #DC2626 6%, var(--color-bg)))">
+<section id="emergencias" class="py-10 px-4" style="background: linear-gradient(to bottom, color-mix(in srgb, var(--color-secondary) 7%, var(--color-bg)), color-mix(in srgb, #DC2626 6%, var(--color-bg)))">
     <div class="max-w-6xl mx-auto">
 
         {{-- Header de sección --}}
@@ -26,7 +26,7 @@
 
         {{-- Tarjeta centrada --}}
         <div class="flex justify-center">
-            <div class="glass rounded-3xl shadow-2xl p-10 md:p-16 flex flex-col items-center text-center max-w-sm w-full">
+            <div class="glass rounded-3xl shadow-2xl p-8 md:p-12 flex flex-col items-center text-center max-w-sm w-full">
 
                 {{-- Logo / Icono --}}
                 @if($logoPath)

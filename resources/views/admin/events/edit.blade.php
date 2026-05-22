@@ -91,7 +91,7 @@
 
             {{-- Read-only info --}}
             <div class="bg-gray-50 rounded-lg p-4 text-sm text-gray-500 space-y-1">
-                <p><span class="font-semibold">Subdominio:</span> <span class="font-mono">{{ $event->subdomain }}.fedeme.ec</span> (no editable)</p>
+                <p><span class="font-semibold">Subdominio:</span> <span class="font-mono">{{ $event->subdomain }}.fedeme.app</span> (no editable)</p>
                 <p><span class="font-semibold">Slug:</span> <span class="font-mono">{{ $event->slug }}</span> (no editable)</p>
             </div>
 

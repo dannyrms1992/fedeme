@@ -6,7 +6,7 @@
     <div>
         <a href="{{ route('admin.events.index') }}" class="text-gray-500 hover:text-gray-800 text-sm">&larr; Volver</a>
         <h1 class="text-2xl font-bold text-gray-800 mt-1">{{ $event->name }}</h1>
-        <p class="text-sm text-gray-500 font-mono">{{ $event->subdomain }}.fedeme.ec</p>
+        <p class="text-sm text-gray-500 font-mono">{{ $event->subdomain }}.fedeme.app</p>
     </div>
     <div class="flex gap-2 flex-wrap">
         <a href="{{ route('admin.events.edit', $event) }}"
@@ -61,7 +61,7 @@
         <h3 class="font-semibold text-gray-700">Módulos de la landing</h3>
         <a href="{{ route('admin.events.modules.edit', $event) }}"
            class="text-sm text-blue-600 hover:text-blue-800 font-medium transition">
-            Configurar contenido &rarr;
+            Configurar módulos &rarr;
         </a>
     </div>
     <table class="w-full text-sm">

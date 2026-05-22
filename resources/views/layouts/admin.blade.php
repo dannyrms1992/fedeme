@@ -6,7 +6,6 @@
     <title>@yield('title', 'Panel Admin') — FEDEME</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="min-h-screen bg-gray-100 antialiased">
 

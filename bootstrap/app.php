@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            // Event subdomain routes — ONLY match *.fedeme.ec subdomains
+            // Event subdomain routes — ONLY match *.fedeme.app subdomains
             // Without this domain constraint every request to fedeme.test/ also
             // matches GET / and crashes because TenantContext is not resolved.
             $appDomain = ltrim(config('app.domain', 'fedeme.app'), '.');

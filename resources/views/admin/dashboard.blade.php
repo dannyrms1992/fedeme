@@ -40,7 +40,7 @@
                 @foreach($recent as $event)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-3 font-medium">{{ $event->name }}</td>
-                        <td class="px-6 py-3 text-gray-500 font-mono text-xs">{{ $event->subdomain }}.fedeme.ec</td>
+                        <td class="px-6 py-3 text-gray-500 font-mono text-xs">{{ $event->subdomain }}.fedeme.app</td>
                         <td class="px-6 py-3">
                             <span class="text-xs px-2 py-1 rounded-full
                                 @if($event->status->value === 'active') bg-green-100 text-green-700

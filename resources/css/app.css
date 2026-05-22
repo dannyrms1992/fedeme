@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Alpine.js — prevent flash of unstyled content */
+[x-cloak] { display: none !important; }
+
 /* ── 1. Tipografía base ────────────────────────────────────────────── */
 @layer base {
     :root {
@@ -57,7 +60,7 @@
 
     /* Bloque header completo centrado */
     .section-header {
-        @apply text-center mb-12;
+        @apply text-center mb-8;
     }
 
     /* Título hero (h1) */

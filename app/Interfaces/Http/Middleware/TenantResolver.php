@@ -60,7 +60,7 @@ final class TenantResolver
     private function extractSubdomain(Request $request): ?string
     {
         $host       = $request->getHost();
-        $appDomain  = config('app.domain', 'fedeme.ec');
+        $appDomain  = config('app.domain', 'fedeme.app');
         $appDomain  = ltrim($appDomain, '.');
 
         // Host must end with the app domain

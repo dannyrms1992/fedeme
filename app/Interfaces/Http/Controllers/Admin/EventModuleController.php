@@ -16,6 +16,22 @@ final class EventModuleController extends Controller
 {
     public function edit(Event $event): View
     {
+        // Garantizar que todos los módulos por defecto existan (inactivos si son nuevos)
+        $allTypes      = ['hero', 'info', 'contact', 'pdf', 'map', 'emergency', 'video_intro'];
+        $existingTypes = $event->modules()->pluck('type')->toArray();
+        $lastOrder     = $event->modules()->max('order') ?? 0;
+
+        foreach ($allTypes as $type) {
+            if (!in_array($type, $existingTypes)) {
+                $event->modules()->create([
+                    'type'      => $type,
+                    'is_active' => false,
+                    'order'     => ++$lastOrder,
+                    'settings'  => [],
+                ]);
+            }
+        }
+
         $modules = $event->modules()->orderBy('order')->get();
 
         return view('admin.events.modules', compact('event', 'modules'));
@@ -54,6 +70,7 @@ final class EventModuleController extends Controller
             'settings'  => ['nullable'],
             'is_active' => ['nullable'],
             'logo'      => ['nullable', 'image', 'max:2048'],
+            'video'     => ['nullable', 'file', 'mimetypes:video/mp4,video/webm', 'max:102400'],
         ]);
 
         // Parse settings — may arrive as array (field-per-field) or as JSON string
@@ -90,6 +107,17 @@ final class EventModuleController extends Controller
             $settings['logo_path'] = $module->settings['logo_path'] ?? '';
         }
 
+        // Handle video upload for video_intro module
+        if ($module->type === 'video_intro' && $request->hasFile('video')) {
+            if (!empty($module->settings['video_path'])) {
+                Storage::disk('public')->delete($module->settings['video_path']);
+            }
+            $path = $request->file('video')->store('events/' . $event->id . '/video', 'public');
+            $settings['video_path'] = $path;
+        } elseif ($module->type === 'video_intro') {
+            $settings['video_path'] = $module->settings['video_path'] ?? '';
+        }
+
         $module->update([
             'settings'  => $settings,
             'is_active' => $request->boolean('is_active', $module->is_active),
@@ -100,7 +128,7 @@ final class EventModuleController extends Controller
 
     public function store(Request $request, Event $event): RedirectResponse
     {
-        $allowed = ['hero', 'info', 'contact', 'pdf', 'map', 'emergency'];
+        $allowed = ['hero', 'info', 'contact', 'pdf', 'map', 'emergency', 'video_intro'];
 
         $request->validate([
             'type' => ['required', 'string', 'in:' . implode(',', $allowed)],

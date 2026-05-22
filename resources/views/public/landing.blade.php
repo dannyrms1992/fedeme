@@ -5,12 +5,13 @@
 {{-- Modules rendered dynamically based on event configuration --}}
 @php
     $sectionIds = [
-        'hero'      => 'inicio',
-        'info'      => 'informacion',
-        'contact'   => 'contacto',
-        'pdf'       => 'documentos',
-        'map'       => 'mapa',
-        'emergency' => 'emergencias',
+        'hero'        => 'inicio',
+        'info'        => 'informacion',
+        'contact'     => 'contacto',
+        'pdf'         => 'documentos',
+        'map'         => 'mapa',
+        'emergency'   => 'emergencias',
+        'video_intro' => 'video-intro',
     ];
 @endphp
 

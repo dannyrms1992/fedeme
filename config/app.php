@@ -70,7 +70,7 @@ return [
     'timezone' => env('APP_TIMEZONE', 'America/Guayaquil'),
 
     // Root domain used by TenantResolver to extract subdomains
-    'domain' => env('APP_DOMAIN', 'fedeme.ec'),
+    'domain' => env('APP_DOMAIN', 'fedeme.app'),
 
     /*
     |--------------------------------------------------------------------------

@@ -16,9 +16,7 @@
             <h3 class="font-semibold text-gray-700 mb-4">Módulos disponibles</h3>
             <ul class="space-y-2 text-sm">
     @php
-                $moduleLabels = ['hero' => 'Hero / Inicio', 'info' => 'Información', 'contact' => 'Contactos', 'pdf' => 'Documento PDF', 'map' => 'Mapa Turístico', 'emergency' => 'Números de Emergencia'];
-                $existingTypes = $event->modules->pluck('type')->toArray();
-                $missingTypes = array_diff(array_keys($moduleLabels), $existingTypes);
+                $moduleLabels = ['hero' => 'Hero / Inicio', 'info' => 'Información', 'contact' => 'Contactos', 'pdf' => 'Documento PDF', 'map' => 'Mapa Turístico', 'emergency' => 'Números de Emergencia', 'video_intro' => 'Video Anuncio'];
                 @endphp
             @foreach($event->modules as $loop_module)
                     <li class="flex items-center gap-1">
@@ -55,25 +53,6 @@
                 @endforeach
             </ul>
         </div>
-
-            {{-- Añadir módulos faltantes --}}
-            @if(count($missingTypes) > 0)
-            <div class="mt-5 pt-4 border-t border-gray-100">
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Añadir módulo</p>
-                @foreach($missingTypes as $missingType)
-                <form method="POST" action="{{ route('admin.events.modules.store', $event) }}" class="mb-2">
-                    @csrf
-                    <input type="hidden" name="type" value="{{ $missingType }}">
-                    <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-xs text-blue-700 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-lg transition font-medium">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                        {{ $moduleLabels[$missingType] }}
-                    </button>
-                </form>
-                @endforeach
-            </div>
-            @endif
-
-        </div>
     </div>
     
     {{-- Module forms --}}
@@ -83,14 +62,14 @@
             <div id="module-{{ $module->id }}" class="bg-white rounded-xl shadow p-6">
                 
                 <form method="POST" action="{{ route('admin.events.modules.update', [$event, $module]) }}"
-                      {!! $module->type === 'emergency' ? 'enctype="multipart/form-data"' : '' !!}>
+                      {!! in_array($module->type, ['emergency', 'video_intro']) ? 'enctype="multipart/form-data"' : '' !!}>
                     @csrf
                     @method('PATCH')
                     
                     <div class="flex items-center justify-between mb-6">
                         <div>
                             <h3 class="text-xl font-bold text-gray-800">
-                                @php $labels = ['hero'=>'Hero / Inicio','info'=>'Información','contact'=>'Contactos','pdf'=>'Documento PDF','map'=>'Mapa Turístico','emergency'=>'Números de Emergencia']; @endphp
+                                @php $labels = ['hero'=>'Hero / Inicio','info'=>'Información','contact'=>'Contactos','pdf'=>'Documento PDF','map'=>'Mapa Turístico','emergency'=>'Números de Emergencia','video_intro'=>'Video Anuncio']; @endphp
                                 {{ $labels[$module->type] ?? ucfirst($module->type) }}
                             </h3>
                             <p class="text-sm text-gray-500">
@@ -100,6 +79,7 @@
                                 @elseif($module->type === 'pdf') Documento PDF embebido
                                 @elseif($module->type === 'map') Mapa turístico interactivo
                                 @elseif($module->type === 'emergency') Números de emergencia con logo y teléfono
+                                @elseif($module->type === 'video_intro') Video anuncio overlay al abrir la página
                                 @else Módulo personalizado
                                 @endif
                             </p>
@@ -219,7 +199,7 @@
                                                 <div>
                                                     <label class="block text-xs font-medium text-gray-500 mb-1">Email</label>
                                                     <input type="email" x-model="contact.email"
-                                                           placeholder="correo@fedeme.ec"
+                                                           placeholder="correo@fedeme.app"
                                                            class="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none">
                                                 </div>
                                                 <div>
@@ -375,6 +355,65 @@
                                 <p class="text-xs">El botón de teléfono genera un enlace <code>tel:</code> para marcar directamente desde el móvil del visitante.</p>
                             </div>
 
+                        </div>
+                    @elseif($module->type === 'video_intro')
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Título del anuncio <span class="text-gray-400 font-normal">(opcional)</span></label>
+                                <input type="text" name="settings[title]"
+                                       value="{{ $module->settings['title'] ?? '' }}"
+                                       placeholder="Ej: Mensaje oficial del presidente"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            </div>
+
+                            {{-- URL externa --}}
+                            <div class="border-t border-gray-100 pt-4">
+                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Opción 1 — URL de video externo</p>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">URL del video</label>
+                                <input type="url" name="settings[video_url]"
+                                       value="{{ $module->settings['video_url'] ?? '' }}"
+                                       placeholder="https://www.youtube.com/watch?v=..."
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono">
+                                <p class="text-xs text-gray-400 mt-1">Acepta YouTube, Vimeo o URL directa de .mp4. Si se configura, tiene prioridad sobre el archivo subido.</p>
+                            </div>
+
+                            {{-- Upload --}}
+                            <div class="border-t border-gray-100 pt-4">
+                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Opción 2 — Subir archivo de video</p>
+                                @if(!empty($module->settings['video_path']))
+                                    <div class="flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                        <svg class="w-8 h-8 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.069A1 1 0 0121 8.867v6.266a1 1 0 01-1.447.902L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-500 font-mono">{{ basename($module->settings['video_path']) }}</p>
+                                            <p class="text-xs text-gray-400 mt-0.5">Sube un nuevo archivo para reemplazarlo</p>
+                                        </div>
+                                    </div>
+                                @endif
+                                <input type="file" name="video" accept="video/mp4,video/webm"
+                                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                <p class="text-xs text-gray-400 mt-1">MP4 o WebM — máx. 100 MB</p>
+                            </div>
+
+                            {{-- show_once --}}
+                            <div class="border-t border-gray-100 pt-4">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="hidden" name="settings[show_once]" value="0">
+                                    <input type="checkbox" name="settings[show_once]" value="1"
+                                           class="w-4 h-4 rounded border-gray-300 text-blue-600"
+                                           {{ filter_var($module->settings['show_once'] ?? true, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '' }}>
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-700">Mostrar solo una vez por visita</span>
+                                        <p class="text-xs text-gray-400">El visitante no verá el anuncio de nuevo mientras no cierre su navegador</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+                                <p class="font-semibold mb-1">💡 Funcionamiento</p>
+                                <p class="text-xs">El video aparece como overlay al abrir la página. El visitante puede pausarlo o cerrarlo con Esc o el botón X. Los videos subidos directamente se reproducen sin sonido por defecto (requisito del navegador para autoplay).</p>
+                            </div>
                         </div>
                     @elseif($module->type === 'hero')
                         <div class="space-y-4">

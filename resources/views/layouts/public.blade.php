@@ -48,8 +48,6 @@
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    {{-- Alpine.js --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
         body { padding-top: 0 !important; }

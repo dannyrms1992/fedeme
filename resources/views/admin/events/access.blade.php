@@ -7,7 +7,7 @@
     <h1 class="text-2xl font-bold text-gray-800 mt-1">Código de acceso — {{ $event->name }}</h1>
     <p class="text-gray-500 text-sm mt-1">
         Configura si el evento requiere un código para ser visualizado en
-        <span class="font-mono">{{ $event->subdomain }}.fedeme.ec</span>
+        <span class="font-mono">{{ $event->subdomain }}.fedeme.app</span>
     </p>
 </div>
 
