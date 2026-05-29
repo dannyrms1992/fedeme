@@ -143,6 +143,40 @@
                                     </div>
                                 </div>
                             </div>
+
+                            {{-- Transmisión en Vivo --}}
+                            <div class="border-t border-gray-100 pt-4">
+                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Transmisión en Vivo</p>
+                                <label class="flex items-start gap-3 cursor-pointer mb-3">
+                                    <input type="hidden" name="settings[live_stream_button]" value="0">
+                                    <input type="checkbox" name="settings[live_stream_button]" value="1"
+                                           class="w-4 h-4 rounded border-gray-300 text-blue-600 mt-0.5"
+                                           {{ filter_var($module->settings['live_stream_button'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '' }}>
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-700">Mostrar botón "Ver transmisión en vivo"</span>
+                                        <p class="text-xs text-gray-400">Abre el Video Anuncio al hacer click. Requiere que el módulo Video Anuncio esté activo y con video configurado.</p>
+                                    </div>
+                                </label>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Subtexto de la tarjeta</label>
+                                    <input type="text" name="settings[live_stream_label]"
+                                           value="{{ $module->settings['live_stream_label'] ?? 'Video oficial del evento' }}"
+                                           placeholder="Ej: Video oficial del evento"
+                                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                    <p class="text-xs text-gray-400 mt-1">Texto descriptivo que aparece bajo el título de la tarjeta</p>
+                                </div>
+                            </div>
+
+                            {{-- Resultados del Evento --}}
+                            <div class="border-t border-gray-100 pt-4">
+                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Resultados del Evento</p>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Enlace de resultados <span class="text-gray-400 font-normal">(opcional)</span></label>
+                                <input type="url" name="settings[results_url]"
+                                       value="{{ $module->settings['results_url'] ?? '' }}"
+                                       placeholder="https://..."
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono">
+                                <p class="text-xs text-gray-400 mt-1">Si se configura, muestra el botón "Ver Resultados" que abre esta página en una nueva pestaña</p>
+                            </div>
                         </div>
                     @elseif($module->type === 'contact')
                         <div class="space-y-5"

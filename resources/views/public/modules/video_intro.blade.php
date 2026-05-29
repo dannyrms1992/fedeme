@@ -61,6 +61,7 @@
     x-cloak
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-6"
     @keydown.escape.window="close()"
+    @open-video-intro.window="open = true"
     role="dialog"
     aria-modal="true"
 >

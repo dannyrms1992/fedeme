@@ -1,7 +1,7 @@
 # FEDEME — Plataforma de Gestión de Eventos
 ## Archivo de contexto para continuación del desarrollo
 
-> Actualizado: 13 de mayo de 2026 (sesión 4)  
+> Actualizado: 29 de mayo de 2026 (sesión 7)  
 > Uso: Abrir este archivo y decirle a GitHub Copilot: **"Lee CONTEXT.md y continúa el desarrollo del proyecto FEDEME"**
 
 ---
@@ -21,7 +21,7 @@ Estoy desarrollando la plataforma oficial de gestión de eventos para FEDEME (Fe
 
 VPS dedicada:
 - 2 vCPU / 8 GB RAM / 100 GB NVMe / 8 TB ancho de banda
-- Ubuntu 22.04 / Nginx / PHP 8.2 / MySQL 8 / Redis / Supervisor / Certbot SSL wildcard
+- Ubuntu 22.04 / Nginx / PHP 8.4 / MySQL 8 / Redis / Supervisor / Certbot SSL wildcard
 - Git / GitHub / VS Code / Despliegue vía SSH / Preparado para CI/CD futuro
 
 ---
@@ -303,7 +303,7 @@ resources/views/
 
 ---
 
-### Módulos de landing (6 tipos)
+### Módulos de landing (7 tipos)
 
 | Tipo | ID sección | Estado | Descripción |
 |---|---|---|---|
@@ -313,8 +313,10 @@ resources/views/
 | `pdf` | `#documentos` | ✅ | PDF embebido con CTA de descarga |
 | `map` | `#mapa` | ✅ | Google Maps embed + botón "Abrir en Google Maps" (responsive) |
 | `emergency` | `#emergencias` | ✅ | Logo (upload) + número de teléfono `tel:` |
+| `video_intro` | `#video-intro` | ✅ | Video anuncio overlay al abrir la página (YouTube/Vimeo/MP4, show_once) |
 
-**Módulos por defecto** en nuevos eventos: `hero`, `info`, `contact`, `emergency`
+**Módulos por defecto** en nuevos eventos: `hero`, `info`, `contact`, `emergency`  
+**Todos los 7 módulos se auto-crean** (inactivos) al entrar al editor de módulos de cualquier evento.
 
 ---
 
@@ -333,7 +335,8 @@ resources/views/
 
 ### Build de assets
 
-- Último build: `app-BmsHQmYg.css` (70.89 kB) + `app-CBbTb_k3.js` (83.04 kB)
+- Último build: `app-BGiSnBBR.css` (72.86 kB) + `app-CBbTb_k3.js` (83.04 kB)
+- `public/build/` **incluido en git** (removido de `.gitignore`) — el servidor no necesita Node.js
 - Storage symlink: `public/storage` → `storage/app/public` ✅
 - Imágenes sincronizadas desde producción:
   - `storage/app/public/events/1/logo/` — logo evento sudamericano
@@ -382,8 +385,13 @@ resources/views/
 ### Prioridad Alta
 
 - [x] ~~Configurar subdominios locales~~ — `sudamericano.fedeme.test` y `campeonato.fedeme.test` en hosts ✅
-- [ ] **Gradientes de sección** — actualmente en 5-8% (muy sutiles), subir a 15-30% para hacerlos visibles
+- [x] ~~Módulo video_intro~~ — overlay anuncio al abrir la página, con URL/archivo/YouTube/Vimeo ✅
+- [x] ~~Espaciado entre módulos~~ — reducido `py-20` → `py-14` → `py-10`, `section-header mb-8` ✅
+- [x] ~~Alpine.js doble instancia~~ — CDN removido de ambos layouts, solo npm + app.js ✅
 - [x] ~~Probar flujo completo de emergency~~ — logo sincronizado desde producción ✅
+- [x] ~~Deploy producción~~ — commit + push + git pull en VPS (22 mayo 2026) ✅
+- [x] ~~Botones adicionales en módulo info~~ — "Ver transmisión en vivo" (reabre overlay video_intro) + "Ver Resultados" (enlace externo configurable) ✅
+- [ ] **Gradientes de sección** — actualmente en 5-8% (muy sutiles), subir a 15-30% para hacerlos visibles
 
 ### Prioridad Media
 
@@ -430,16 +438,28 @@ El formulario admin usa `{!! !!}` (NO `{{ }}`) para renderizar `enctype="multipa
 Al generar atributos HTML dinámicos en Blade que contienen comillas (como `enctype="..."`, `style="..."` con valores variables), siempre usar `{!! !!}` en lugar de `{{ }}`.
 
 ### enctype en forms con archivos
-Solo el formulario de módulo `emergency` lleva `enctype="multipart/form-data"`. Los demás módulos no suben archivos directamente (las imágenes de hero/logo van por rutas separadas en `EventImageController`).
+Los formularios de módulos `emergency` y `video_intro` llevan `enctype="multipart/form-data"`. La condición es `in_array($module->type, ['emergency', 'video_intro'])` en `modules.blade.php`.
 
-### Módulo info — campos Lugar y Fecha
-`settings` del módulo `info` soporta ahora 4 campos adicionales:
+### Módulo info — campos Lugar, Fecha, Transmisión y Resultados
+`settings` del módulo `info` soporta los siguientes campos:
 - `location` — nombre del lugar visible al visitante
 - `location_query` — query para Google Maps dirección (`/maps/dir/?destination=`)
 - `date_start` — fecha ISO `YYYY-MM-DD`
 - `date_end` — fecha ISO opcional (si difiere de `date_start` se muestra rango)
+- `live_stream_button` — bool; activa tarjeta "Transmisión en Vivo" con botón que reabre el overlay de `video_intro`
+- `live_stream_label` — texto descriptivo de la tarjeta de transmisión (default: "Video oficial del evento")
+- `results_url` — URL opcional; si está configurada muestra tarjeta "Resultados" con enlace externo
 
 Las fechas se formatean en español ("5 al 10 de marzo de 2026"). Si es mismo mes y año → formato corto; si son meses distintos → formato largo con guion. Se calcula y muestra el número de días del evento si es rango.
+
+Las 4 tarjetas se renderizan en un grid `sm:grid-cols-2`: Lugar (`--color-primary`), Fecha (`--color-secondary`), Transmisión (`--color-accent`), Resultados (`--color-primary`). Cada tarjeta solo aparece si su campo está configurado.
+
+### Módulo info ↔ video_intro — comunicación entre componentes
+El botón "Ver transmisión en vivo" del módulo `info` dispara un evento nativo del navegador:
+```js
+window.dispatchEvent(new CustomEvent('open-video-intro'))
+```
+El módulo `video_intro` escucha ese evento con `@open-video-intro.window="open = true"` en su componente Alpine. El botón **bypasea** el `show_once` (sessionStorage) — siempre reabre el overlay al hacer click explícito. La tarjeta solo se renderiza si `live_stream_button = true` Y el módulo `video_intro` está activo con `video_url` o `video_path` configurado (verificado contra `$modules` ya cargado, sin query extra).
 
 ### Carrusel — Lightbox
 `resources/views/components/carousel.blade.php` incluye lightbox integrado con Alpine.js:
@@ -456,6 +476,18 @@ Gradiente diagonal `135deg` de `color-mix(primary 92%, black)` a `color-mix(seco
 
 ### Módulo map — responsive
 La barra browser decorativa (puntos rojo/amarillo/verde + barra URL) se oculta en mobile (`hidden sm:flex`). El botón "Abrir en Google Maps" siempre visible, centrado en mobile con mejor contraste (`bg-white/10 border-white/20 text-white font-semibold`).
+
+### Módulo video_intro — overlay de anuncio
+`resources/views/public/modules/video_intro.blade.php` — overlay `fixed inset-0 z-50` que aparece al cargar la página.
+- **Settings**: `video_url` (YouTube/Vimeo/MP4 directo), `video_path` (archivo subido), `title`, `show_once` (bool)
+- `video_url` tiene prioridad sobre `video_path`. YouTube `watch?v=` se convierte a embed. Vimeo ídem.
+- `$isEmbed=true` → `<iframe allowfullscreen>`. `$isEmbed=false` → `<video controls playsinline>` (sin muted/autoplay)
+- Big play button overlay (Alpine `paused` state) con `pointer-events-auto` centrado sobre el video
+- `show_once=true` → usa `sessionStorage` para no repetir en la misma sesión del navegador
+- Alpine: `{ open: true, paused: true, init() { check sessionStorage }, close() { set sessionStorage + video.pause() } }`
+- Tecla ESC cierra el overlay (`@keydown.escape.window`)
+- Archivos de video: `Storage::disk('public')`, path `events/{id}/video/`, max 100MB (mp4/webm)
+- En `EventModuleController::edit()` se auto-crean los 7 módulos si no existen (inactivos)
 
 ### Acción Eliminar en listado de eventos
 `admin/events/index.blade.php` incluye botón Eliminar con `confirm()` nativo. Envía `DELETE /admin/events/{id}` via formulario con `@method('DELETE')`. El controlador `EventController::destroy()` borra el evento e invalida su caché Redis.

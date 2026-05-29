@@ -1,12 +1,23 @@
 {{-- Info Module with Glass Effect --}}
 @php
-    $settings       = $module->settings ?? [];
-    $title          = $settings['title']          ?? 'Información General';
-    $content        = $settings['content']        ?? '';
-    $location       = $settings['location']       ?? '';
-    $locationQuery  = $settings['location_query'] ?? $location;
-    $dateStart      = $settings['date_start']     ?? '';
-    $dateEnd        = $settings['date_end']        ?? '';
+    $settings          = $module->settings ?? [];
+    $title             = $settings['title']             ?? 'Información General';
+    $content           = $settings['content']           ?? '';
+    $location          = $settings['location']          ?? '';
+    $locationQuery     = $settings['location_query']    ?? $location;
+    $dateStart         = $settings['date_start']        ?? '';
+    $dateEnd           = $settings['date_end']          ?? '';
+    $liveStreamButton  = filter_var($settings['live_stream_button'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    $liveStreamLabel   = $settings['live_stream_label'] ?? 'Video oficial del evento';
+    $resultsUrl        = $settings['results_url']       ?? '';
+
+    // Mostrar botón de transmisión solo si video_intro está activo y tiene video configurado
+    $videoIntroModule = isset($modules) ? $modules->where('type', 'video_intro')->where('is_active', true)->first() : null;
+    $hasActiveVideo   = $videoIntroModule && (
+        !empty($videoIntroModule->settings['video_url'] ?? '') ||
+        !empty($videoIntroModule->settings['video_path'] ?? '')
+    );
+    $showLiveButton = $liveStreamButton && $hasActiveVideo;
 
     // Formatear fechas en español
     $meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -59,7 +70,7 @@
                 <p class="text-gray-400 italic text-center py-8">Sin información configurada aún.</p>
             @endif
 
-            @if($location || $dateLabel)
+            @if($location || $dateLabel || $showLiveButton || $resultsUrl)
                 <div class="mt-8 pt-8 border-t border-gray-200/70 grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                     {{-- Lugar --}}
@@ -152,6 +163,62 @@
                             @if($duration)
                                 <p class="text-xs text-gray-400 mt-1">Duración: {{ $duration }} {{ $duration === 1 ? 'día' : 'días' }}</p>
                             @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Transmisión en Vivo --}}
+                    @if($showLiveButton)
+                    <div class="flex items-start gap-4 rounded-2xl p-5"
+                         style="background: color-mix(in srgb, var(--color-accent) 7%, white)">
+                        <div class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-sm"
+                             style="background: color-mix(in srgb, var(--color-accent) 15%, white)">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                 style="color: var(--color-accent)">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 10l4.553-2.069A1 1 0 0121 8.867v6.266a1 1 0 01-1.447.902L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: var(--color-accent)">Transmisión en Vivo</p>
+                            <p class="text-sm font-medium text-gray-800 leading-snug">{{ $liveStreamLabel }}</p>
+                            <button type="button"
+                                    onclick="window.dispatchEvent(new CustomEvent('open-video-intro'))"
+                                    class="inline-flex items-center gap-1.5 mt-2.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-150 shadow-sm hover:shadow-md hover:-translate-y-px"
+                                    style="background: var(--color-accent); color: white">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                                Ver transmisión en vivo
+                            </button>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Ver Resultados --}}
+                    @if($resultsUrl)
+                    <div class="flex items-start gap-4 rounded-2xl p-5"
+                         style="background: color-mix(in srgb, var(--color-primary) 7%, white)">
+                        <div class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-sm"
+                             style="background: color-mix(in srgb, var(--color-primary) 15%, white)">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                 style="color: var(--color-primary)">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: var(--color-primary)">Resultados</p>
+                            <p class="text-sm font-medium text-gray-800 leading-snug">Clasificaciones y resultados</p>
+                            <a href="{{ $resultsUrl }}" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 mt-2.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-150 shadow-sm hover:shadow-md hover:-translate-y-px"
+                               style="background: var(--color-primary); color: white">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                                Ver Resultados
+                            </a>
                         </div>
                     </div>
                     @endif
