@@ -463,6 +463,21 @@
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
                                     placeholder="Descripción breve">{{ $module->settings['subtitle'] ?? '' }}</textarea>
                             </div>
+
+                            {{-- Toggle carrusel --}}
+                            <div class="border-t border-gray-100 pt-4">
+                                <label class="flex items-start gap-3 cursor-pointer">
+                                    <input type="hidden" name="settings[show_carousel]" value="0">
+                                    <input type="checkbox" name="settings[show_carousel]" value="1"
+                                           class="w-4 h-4 rounded border-gray-300 text-blue-600 mt-0.5"
+                                           {{ filter_var($module->settings['show_carousel'] ?? true, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '' }}>
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-700">Mostrar sección de carrusel</span>
+                                        <p class="text-xs text-gray-400">Si está desactivado, la sección de imágenes no aparece en la página aunque haya imágenes subidas</p>
+                                    </div>
+                                </label>
+                            </div>
+
                             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
                                 <p class="font-semibold mb-1">💡 Carrusel e Imágenes</p>
                                 <p>El logo y las imágenes del carrusel se configuran desde la sección <strong>Editar Evento</strong>.</p>

@@ -1,10 +1,12 @@
 {{-- Hero Module with Carousel --}}
 @php
-    $settings = $module->settings ?? [];
-    $title    = $settings['title']    ?? $event->name;
-    $subtitle = $settings['subtitle'] ?? ($event->description ?? '');
+    $settings      = $module->settings ?? [];
+    $title         = $settings['title']         ?? $event->name;
+    $subtitle      = $settings['subtitle']      ?? ($event->description ?? '');
+    $showCarousel  = filter_var($settings['show_carousel'] ?? true, FILTER_VALIDATE_BOOLEAN);
 @endphp
 
+@if($showCarousel)
 <section class="relative" style="background: linear-gradient(to bottom, var(--color-bg), color-mix(in srgb, var(--color-primary) 8%, var(--color-bg)))">
 
     {{-- Carousel or Hero Image --}}
@@ -29,3 +31,4 @@
     </div>
 
 </section>
+@endif

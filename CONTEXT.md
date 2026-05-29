@@ -1,7 +1,7 @@
 # FEDEME — Plataforma de Gestión de Eventos
 ## Archivo de contexto para continuación del desarrollo
 
-> Actualizado: 29 de mayo de 2026 (sesión 7)  
+> Actualizado: 29 de mayo de 2026 (sesión 7 — continuación)  
 > Uso: Abrir este archivo y decirle a GitHub Copilot: **"Lee CONTEXT.md y continúa el desarrollo del proyecto FEDEME"**
 
 ---
@@ -391,6 +391,7 @@ resources/views/
 - [x] ~~Probar flujo completo de emergency~~ — logo sincronizado desde producción ✅
 - [x] ~~Deploy producción~~ — commit + push + git pull en VPS (22 mayo 2026) ✅
 - [x] ~~Botones adicionales en módulo info~~ — "Ver transmisión en vivo" (reabre overlay video_intro) + "Ver Resultados" (enlace externo configurable) ✅
+- [x] ~~Toggle carrusel en módulo hero~~ — `show_carousel` en settings oculta la sección completa cuando está OFF ✅
 - [ ] **Gradientes de sección** — actualmente en 5-8% (muy sutiles), subir a 15-30% para hacerlos visibles
 
 ### Prioridad Media
@@ -460,6 +461,14 @@ El botón "Ver transmisión en vivo" del módulo `info` dispara un evento nativo
 window.dispatchEvent(new CustomEvent('open-video-intro'))
 ```
 El módulo `video_intro` escucha ese evento con `@open-video-intro.window="open = true"` en su componente Alpine. El botón **bypasea** el `show_once` (sessionStorage) — siempre reabre el overlay al hacer click explícito. La tarjeta solo se renderiza si `live_stream_button = true` Y el módulo `video_intro` está activo con `video_url` o `video_path` configurado (verificado contra `$modules` ya cargado, sin query extra).
+
+### Módulo hero — toggle de carrusel
+`settings` del módulo `hero` soporta los campos:
+- `title` — título personalizado (default: nombre del evento)
+- `subtitle` — subtítulo (default: descripción del evento)
+- `show_carousel` — bool (default: `true`); controla la visibilidad de toda la sección hero en la landing
+
+Cuando `show_carousel = false`, el `<section>` completo del hero **no se renderiza** — la sección desaparece de la página aunque haya imágenes subidas en el carrusel. Se configura desde el editor de módulos (mismo lugar que el resto de módulos). El default `true` garantiza compatibilidad con eventos existentes.
 
 ### Carrusel — Lightbox
 `resources/views/components/carousel.blade.php` incluye lightbox integrado con Alpine.js:
