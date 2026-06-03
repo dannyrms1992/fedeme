@@ -20,6 +20,10 @@
         } elseif (preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $videoUrl, $m)) {
             $videoSrc = 'https://www.youtube.com/embed/' . $m[1] . '?autoplay=1&mute=1&rel=0';
             $isEmbed  = true;
+        // YouTube: live URL
+        } elseif (preg_match('/youtube\.com\/live\/([a-zA-Z0-9_-]+)/', $videoUrl, $m)) {
+            $videoSrc = 'https://www.youtube.com/embed/' . $m[1] . '?autoplay=1&mute=1&rel=0';
+            $isEmbed  = true;
         // Vimeo
         } elseif (preg_match('/vimeo\.com\/(\d+)/', $videoUrl, $m)) {
             $videoSrc = 'https://player.vimeo.com/video/' . $m[1] . '?autoplay=1&muted=1';
