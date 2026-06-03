@@ -91,15 +91,36 @@
         </div>
 
         {{-- Video --}}
-        <div class="relative rounded-xl overflow-hidden shadow-2xl bg-black aspect-video">
+        <div class="relative rounded-xl overflow-hidden shadow-2xl bg-black aspect-video"
+             @if($isEmbed) x-data="{ muted: true, unmute() {
+                 this.$refs.embedFrame.src = this.$refs.embedFrame.src.replace('mute=1', 'mute=0');
+                 this.muted = false;
+             }}" @endif>
             @if($isEmbed)
                 <iframe
+                    x-ref="embedFrame"
                     src="{{ $videoSrc }}"
                     class="w-full h-full"
                     frameborder="0"
                     allow="autoplay; fullscreen; picture-in-picture"
                     allowfullscreen
                 ></iframe>
+
+                {{-- Botón activar sonido — visible en mobile donde los controles del iframe no son accesibles --}}
+                <div x-show="muted"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 translate-y-2"
+                     class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
+                    <button @click="unmute()"
+                            class="flex items-center gap-2 bg-black/70 hover:bg-black/90 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2.5 rounded-full border border-white/20 shadow-lg transition-all duration-150 active:scale-95">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15.536 8.464a5 5 0 010 7.072M12 6v12m0 0l-3-3m3 3l3-3M9 10H5.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5H9l4 4V6L9 10z"/>
+                        </svg>
+                        Activar sonido
+                    </button>
+                </div>
             @else
                 {{--
                     Sin muted ni autoplay: el overlay aparece automáticamente pero el video
