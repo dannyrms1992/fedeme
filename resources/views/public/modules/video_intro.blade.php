@@ -44,6 +44,8 @@
     x-data="{
         open: true,
         paused: true,
+        muted: true,
+        embedSrc: '{{ $videoSrc }}',
         init() {
             @if($showOnce)
             if (sessionStorage.getItem('{{ $sessionKey }}')) {
@@ -56,16 +58,30 @@
             @if($showOnce)
             sessionStorage.setItem('{{ $sessionKey }}', '1');
             @endif
-            @if(!$isEmbed)
+            @if($isEmbed)
+            if (this.$refs.embedFrame) this.$refs.embedFrame.src = '';
+            @else
             if (this.$refs.video) this.$refs.video.pause();
             @endif
+        },
+        reopen() {
+            this.open = true;
+            @if($isEmbed)
+            this.muted = true;
+            if (this.$refs.embedFrame) this.$refs.embedFrame.src = this.embedSrc;
+            @endif
+        },
+        unmute() {
+            const src = this.embedSrc.replace('mute=1', 'mute=0').replace('muted=1', 'muted=0');
+            if (this.$refs.embedFrame) this.$refs.embedFrame.src = src;
+            this.muted = false;
         }
     }"
     x-show="open"
     x-cloak
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-6"
     @keydown.escape.window="close()"
-    @open-video-intro.window="open = true"
+    @open-video-intro.window="reopen()"
     role="dialog"
     aria-modal="true"
 >
@@ -91,11 +107,7 @@
         </div>
 
         {{-- Video --}}
-        <div class="relative rounded-xl overflow-hidden shadow-2xl bg-black aspect-video"
-             @if($isEmbed) x-data="{ muted: true, unmute() {
-                 this.$refs.embedFrame.src = this.$refs.embedFrame.src.replace('mute=1', 'mute=0');
-                 this.muted = false;
-             }}" @endif>
+        <div class="relative rounded-xl overflow-hidden shadow-2xl bg-black aspect-video">
             @if($isEmbed)
                 <iframe
                     x-ref="embedFrame"
